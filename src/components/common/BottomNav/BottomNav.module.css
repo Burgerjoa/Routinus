@@ -1,0 +1,20 @@
+.nav {
+    display: flex;
+    height: 56px;
+    border-top: 1px solid #e5e7eb;
+    background: #ffffff;
+}
+
+.nav button {
+    flex: 1;
+    border: none;
+    background: none;
+    font-size: 16px;
+    color: #6b7280;
+    cursor: pointer;
+}
+
+.active {
+    color: #3b82f6;
+    font-weight: 600;
+}
