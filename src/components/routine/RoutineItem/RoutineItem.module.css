@@ -1,5 +1,7 @@
+
 .item {
     display: flex;
+    height: auto;
     align-items: flex-start;
     background: #ffffff;
     padding: 12px;

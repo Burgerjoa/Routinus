@@ -1,61 +1,105 @@
 // src/App.jsx
-import React, { useState, useEffect } from 'react' // useEffect 추가
+import React, { useState, useEffect } from 'react'
 import Header          from './components/common/Header/Header'
 import RoutineList     from './components/routine/RoutineList/RoutineList'
 import AddRoutineModal from './components/routine/AddroutineModal/AddRoutineModal'
 import BottomNav       from './components/common/BottomNav/BottomNav'
 import styles          from './App.css'
-import ChatList        from './components/chatting/chat' // 채팅 컴포넌트 임포트
+import ChatList        from './components/chatting/chat'
+import { useFirestore } from './hooks/useFirestore' // 추가
 
-const STORAGE_KEY = 'routinus-routines' // 로컬스토리지 키 상수
+const TAB_STORAGE_KEY = 'routinus-current-tab'
 
 export default function App() {
-  const [currentTab, setCurrentTab] = useState('routine')
+  const { addRoutine, updateRoutine, deleteRoutine, subscribeToRoutines } = useFirestore()
 
-  // 초기값 로드
-  const [routines, setRoutines] = useState(() => {
+  // 저장된 탭 불러오기
+  const [currentTab, setCurrentTab] = useState(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY)
-      return saved ? JSON.parse(saved) : [
-        { id: 1, title: '기상', time: '9:00 오전', streak: 314, done: false },
-        { id: 2, title: '운동', time: '5:00 오후', streak: 314, done: true  },
-      ]
+      const savedTab = localStorage.getItem(TAB_STORAGE_KEY)
+      return savedTab || 'routine'
     } catch (error) {
-      console.error('로컬스토리지 데이터 로드 실패:', error)
-      return [
-        { id: 1, title: '기상', time: '9:00 오전', streak: 314, done: false },
-        { id: 2, title: '운동', time: '5:00 오후', streak: 314, done: true  },
-      ]
+      console.error('탭 정보 로드 실패:', error)
+      return 'routine'
     }
   })
 
+  // Firestore에서 루틴 데이터 관리
+  const [routines, setRoutines] = useState([])
+  const [loading, setLoading] = useState(true) // 로딩 상태 추가
   const [modalOpen, setModalOpen] = useState(false)
 
-  // 로컬스토리지에 저장
+  // 컴포넌트 마운트 시 Firestore 실시간 구독
+  useEffect(() => {
+    const unsubscribe = subscribeToRoutines((data) => {
+      setRoutines(data)
+      setLoading(false) // 첫 데이터 로드 완료
+    })
+
+    // 컴포넌트 언마운트 시 구독 해제
+    return () => unsubscribe()
+  }, [])
+
+  // currentTab 변경 시 로컬스토리지에 저장
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(routines))
+      localStorage.setItem(TAB_STORAGE_KEY, currentTab)
     } catch (error) {
-      console.error('로컬스토리지 저장 실패:', error)
+      console.error('탭 정보 저장 실패:', error)
     }
-  }, [routines]) // routines가 변경될 때마다 실행
+  }, [currentTab])
 
   // 루틴 추가
-  const handleAdd = formValues => {
-    setRoutines(prev => [
-      ...prev,
-      { id: Date.now(), streak: 0, done: false, ...formValues }
-    ])
+  const handleAdd = async (formValues) => {
+    try {
+      await addRoutine({
+        title: formValues.title,
+        time: formValues.time,
+        streak: 0,
+        done: false
+      })
+      // 실시간 구독으로 자동 업데이트되므로 setRoutines 불필요
+    } catch (error) {
+      alert('루틴 추가에 실패했습니다.')
+    }
   }
 
-  // 루틴 제거
-  const handleRemove = id => {
-    setRoutines(prev => prev.filter(r => r.id !== id))
+  // 루틴 삭제
+  const handleRemove = async (id) => {
+    try {
+      await deleteRoutine(id)
+      // 실시간 구독으로 자동 업데이트되므로 setRoutines 불필요
+    } catch (error) {
+      alert('루틴 삭제에 실패했습니다.')
+    }
   }
 
-  // 완료/미완료 카운트
+  // 루틴 완료 상태 토글
+  const handleToggleDone = async (id) => {
+    try {
+      const routine = routines.find(r => r.id === id)
+      if (routine) {
+        await updateRoutine(id, { done: !routine.done })
+        // 실시간 구독으로 자동 업데이트되므로 setRoutines 불필요
+      }
+    } catch (error) {
+      alert('루틴 상태 변경에 실패했습니다.')
+    }
+  }
+
   const doneCount    = routines.filter(r => r.done).length
   const pendingCount = routines.length - doneCount
+
+  // 로딩 중일 때 표시
+  if (loading) {
+    return (
+      <div className={styles.appContainer}>
+        <div style={{ padding: 16, textAlign: 'center' }}>
+          로딩 중...
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.appContainer}>
@@ -65,8 +109,8 @@ export default function App() {
           <Header
             date={new Date().toLocaleDateString('ko-KR', {
               year: 'numeric',
-              month:   '2-digit',
-              day:     '2-digit',
+              month: '2-digit',
+              day: '2-digit',
               weekday: 'short'
             })}
             doneCount={doneCount}
@@ -77,17 +121,13 @@ export default function App() {
           <RoutineList
             routines={routines}
             onRemove={handleRemove}
-            onToggleDone={id =>
-              setRoutines(prev =>
-                prev.map(r => (r.id === id ? { ...r, done: !r.done } : r))
-              )
-            }
+            onToggleDone={handleToggleDone}
           />
 
           {modalOpen && (
             <AddRoutineModal
               onClose={() => setModalOpen(false)}
-              onSave={formValues => {
+              onSave={(formValues) => {
                 handleAdd(formValues)
                 setModalOpen(false)
               }}
