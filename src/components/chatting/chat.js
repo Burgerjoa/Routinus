@@ -60,7 +60,7 @@ function Chat() {
 
   return (
     <div className="chat-container">
-      <h1>Firebase 채팅 데모</h1>
+      <h1>Routinus 루틴 공유방</h1>
       
       {/* 사용자 이름 입력 */}
       <div className="user-input">
