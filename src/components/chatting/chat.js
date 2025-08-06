@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 import { collection, addDoc, onSnapshot, orderBy, query, serverTimestamp } from 'firebase/firestore'
-import { db, auth } from './firebase'
+import { db, auth } from '../firebase/firebase'
 import './chat.css'
 
 function Chat({user}) {
 
   const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
-  const [userName, setUserName] = useState('')
+  const [userName, setUserName] = useState('default')
 
   const userLoginTime = new Date();
   const currentUser = auth.currentUser;
@@ -70,10 +70,20 @@ function Chat({user}) {
     }
   }
 
+  // 닉네임 변경 함수
+  const handleNicknameChange = () => {
+    const newNickname = prompt('닉네임을 입력하세요:', userName)
+
+    // 사용자가 취소를 누르거나(null) 빈 문자열을 입력한 경우 변경하지 않음
+    if (newNickname !== null && newNickname.trim() !== '') {
+      setUserName(newNickname.trim())
+    }
+  }
+
   return (
     <div className="chat-container">
       <h1>Routinus 루틴 공유방</h1>
-      <button onClick={() => setUserName(prompt('닉네임을 입력하세요:'))}>닉네임 설정</button>
+      <button onClick={handleNicknameChange}>닉네임 설정</button>
       <div className='userinfo'>
         <p className='nickname-section'>현재 내 닉네임 : {userName}</p>
         <p className='login-time-info'>접속 시간 : {userLoginTime.toLocaleTimeString()}</p>
