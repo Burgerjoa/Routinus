@@ -1,21 +1,21 @@
 // src/App.jsx
-import React, { useState, useEffect } from 'react' // useEffect 추가
+import React, { useState, useEffect } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
-import { auth } from './components/chatting/firebase' // Firebase 인증 가져오기
+import { auth } from './components/chatting/firebase'
 import Header          from './components/common/Header/Header'
 import RoutineList     from './components/routine/RoutineList/RoutineList'
 import AddRoutineModal from './components/routine/AddroutineModal/AddRoutineModal'
 import BottomNav       from './components/common/BottomNav/BottomNav'
-import styles          from './App.css'
-import ChatList        from './components/chatting/chat' // 채팅 컴포넌트 임포트
-import Login           from './components/login/login' // 로그인 컴포넌트 임포트
+import styles          from './App.module.css'
+import ChatList        from './components/chatting/chat'
+import Login           from './components/login/login'
 
-const STORAGE_KEY = 'routinus-routines' // 로컬스토리지 키 상수
+const STORAGE_KEY = 'routinus-routines'
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState('routine')
   const [user, setUser] = useState(null)
-  const [authLoading, setAuthLoading] = useState(true)
+  const [authLoading, setAuthLoading] = useState(true) // 수정: 올바른 구조분해할당
 
   // 초기값 로드
   const [routines, setRoutines] = useState(() => {
@@ -43,7 +43,7 @@ export default function App() {
     } catch (error) {
       console.error('로컬스토리지 저장 실패:', error)
     }
-  }, [routines]) // routines가 변경될 때마다 실행
+  }, [routines])
 
   // 루틴 추가
   const handleAdd = formValues => {
@@ -66,11 +66,21 @@ export default function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser)
-      setAuthLoading(false)
+      setAuthLoading(false) // 이제 정상적으로 함수 호출 가능
     })
-    
+
     return () => unsubscribe()
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // 의존성 배열을 빈 배열로 변경
+
+// 인증 로딩 중일 때
+  if (authLoading) {
+    return (
+      <div className={styles.loading}>
+        <div className={styles.spinner}></div>
+      </div>
+    )
+  }
 
   // 로그인되지 않은 경우 로그인 페이지 표시
   if (!user) {
@@ -85,8 +95,8 @@ export default function App() {
           <Header
             date={new Date().toLocaleDateString('ko-KR', {
               year: 'numeric',
-              month:   '2-digit',
-              day:     '2-digit',
+              month: '2-digit',
+              day: '2-digit',
               weekday: 'short'
             })}
             doneCount={doneCount}
