@@ -5,6 +5,7 @@ import RoutineList     from './components/routine/RoutineList/RoutineList'
 import AddRoutineModal from './components/routine/AddroutineModal/AddRoutineModal'
 import BottomNav       from './components/common/BottomNav/BottomNav'
 import styles          from './App.css'
+import ChatList        from './components/chatting/chat' // 채팅 컴포넌트 임포트
 
 const STORAGE_KEY = 'routinus-routines' // 로컬스토리지 키 상수
 
@@ -97,8 +98,8 @@ export default function App() {
 
       {/* ===== 채팅 탭 ===== */}
       {currentTab === 'chat' && (
-        <div style={{ padding: 16, textAlign: 'center' }}>
-          채팅방 화면 (ChatList 컴포넌트로 교체)
+        <div style={{ padding: 16 }}>
+          <ChatList />
         </div>
       )}
 
