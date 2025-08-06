@@ -1,7 +1,7 @@
 // src/App.jsx
 import React, { useState, useEffect } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
-import { auth } from './components/chatting/firebase'
+import { auth } from './components/firebase/firebase' // Firebase 인증 가져오기
 import Header          from './components/common/Header/Header'
 import RoutineList     from './components/routine/RoutineList/RoutineList'
 import AddRoutineModal from './components/routine/AddroutineModal/AddRoutineModal'

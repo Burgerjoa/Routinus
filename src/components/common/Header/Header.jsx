@@ -1,6 +1,6 @@
 import React from 'react'
 import { signOut } from 'firebase/auth'
-import { auth } from '../../chatting/firebase' // 경로는 실제 firebase.js 위치에 맞게 수정
+import { auth } from '../../firebase/firebase' // 경로는 실제 firebase.js 위치에 맞게 수정
 import styles from './Header.module.css'
 
 export default function Header({ date, doneCount, pendingCount, onAddClick }) {
