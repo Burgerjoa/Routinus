@@ -1,10 +1,11 @@
 // RoutineList.jsx
 import React from 'react'
 import RoutineItem from '../RoutineItem/RoutineItem'
+import styles from './RoutineList.module.css'
 
 export default function RoutineList({ routines, onRemove, onToggleDone }) {
   return (
-    <div>
+    <div className={styles.list}>
       {routines.map(r => (
         <RoutineItem
           key={r.id}
