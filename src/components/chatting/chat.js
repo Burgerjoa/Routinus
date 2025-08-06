@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react'
-import { collection, addDoc, onSnapshot, orderBy, query, serverTimestamp, where } from 'firebase/firestore'
+import { collection, addDoc, onSnapshot, orderBy, query, serverTimestamp } from 'firebase/firestore'
 import { db } from './firebase'
 import './chat.css'
 
-function Chat() {
+function Chat({user}) {
 
   const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
   const [userName, setUserName] = useState('')
-
-  const userJoinTime = new Date(); // 사용자 입장 시간
 
   // timestamp를 문자열로 변환하는 함수
   const formatTimestamp = (timestamp) => {
@@ -23,11 +21,16 @@ function Chat() {
     return String(timestamp)
   }
 
+  useEffect(() => {
+    if (user) {
+      setUserName(user.email)
+    }
+  }, [user])
+
   // Firebase에서 메시지 실시간 구독
   useEffect(() => {
     const q = query(
       collection(db, 'messages'), 
-      where('timestamp', '>=', userJoinTime),
       orderBy('timestamp', 'asc'))
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -66,18 +69,8 @@ function Chat() {
   return (
     <div className="chat-container">
       <h1>Routinus 루틴 공유방</h1>
-      <p>사용자 채팅 입장 시간 : {userJoinTime.toLocaleTimeString()}</p>
-
-      {/* 사용자 이름 입력 */}
-      <div className="user-input">
-        <input
-          type="text"
-          placeholder="사용자 이름 입력"
-          value={userName}
-          onChange={(e) => setUserName(e.target.value)}
-          className="user-name-input"
-        />
-      </div>
+      <button onClick={() => setUserName(prompt('닉네임을 입력하세요:'))}>닉네임 설정</button>
+      <p>현재 내 닉네임 : {userName}</p>
 
       {/* 메시지 목록 */}
       <div className="messages-container">
