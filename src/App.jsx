@@ -129,7 +129,7 @@ export default function App() {
       {/* ===== 채팅 탭 ===== */}
       {currentTab === 'chat' && (
         <div style={{ padding: 16 }}>
-          <ChatList />
+          <ChatList user={user} />
         </div>
       )}
 

@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react'
-import { collection, addDoc, onSnapshot, orderBy, query, serverTimestamp, where } from 'firebase/firestore'
-import { db } from './firebase'
+import { collection, addDoc, onSnapshot, orderBy, query, serverTimestamp } from 'firebase/firestore'
+import { db, auth } from './firebase'
 import './chat.css'
 
-function Chat() {
+function Chat({user}) {
 
   const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
   const [userName, setUserName] = useState('')
 
-  const userJoinTime = new Date(); // 사용자 입장 시간
+  const userLoginTime = new Date();
+  const currentUser = auth.currentUser;
 
   // timestamp를 문자열로 변환하는 함수
   const formatTimestamp = (timestamp) => {
@@ -23,11 +24,16 @@ function Chat() {
     return String(timestamp)
   }
 
+  useEffect(() => {
+    if (user) {
+      setUserName(user.email)
+    }
+  }, [user])
+
   // Firebase에서 메시지 실시간 구독
   useEffect(() => {
     const q = query(
       collection(db, 'messages'), 
-      where('timestamp', '>=', userJoinTime),
       orderBy('timestamp', 'asc'))
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -48,7 +54,8 @@ function Chat() {
         await addDoc(collection(db, 'messages'), {
           text: newMessage,
           user: userName,
-          timestamp: serverTimestamp()
+          timestamp: serverTimestamp(),
+          id: currentUser.uid,
         })
         setNewMessage('')
       } catch (error) {
@@ -66,26 +73,23 @@ function Chat() {
   return (
     <div className="chat-container">
       <h1>Routinus 루틴 공유방</h1>
-      <p>사용자 채팅 입장 시간 : {userJoinTime.toLocaleTimeString()}</p>
-
-      {/* 사용자 이름 입력 */}
-      <div className="user-input">
-        <input
-          type="text"
-          placeholder="사용자 이름 입력"
-          value={userName}
-          onChange={(e) => setUserName(e.target.value)}
-          className="user-name-input"
-        />
+      <button onClick={() => setUserName(prompt('닉네임을 입력하세요:'))}>닉네임 설정</button>
+      <div className='userinfo'>
+        <p className='nickname-section'>현재 내 닉네임 : {userName}</p>
+        <p className='login-time-info'>접속 시간 : {userLoginTime.toLocaleTimeString()}</p>
       </div>
 
       {/* 메시지 목록 */}
       <div className="messages-container">
         {messages.map(message => (
-          <div key={message.id} className="message">
-            <span className="message-user">{message.user}:</span>
-            <span className="message-text">{message.text}</span>
-            <span className="message-time">{formatTimestamp(message.timestamp)}</span>
+          <div key={message.id} className={`message ${message.id === currentUser.uid ? 'my-message' : 'other-message'}`}>
+            <div className="message-info">
+              <span className="message-user">{message.user}</span>
+              <span className="message-time">{formatTimestamp(message.timestamp)}</span>
+            </div>
+            <div className="message-bubble">
+              <div className="message-text">{message.text}</div>
+            </div>
           </div>
         ))}
       </div>
