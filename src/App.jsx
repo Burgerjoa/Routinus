@@ -15,7 +15,7 @@ const STORAGE_KEY = 'routinus-routines' // 로컬스토리지 키 상수
 export default function App() {
   const [currentTab, setCurrentTab] = useState('routine')
   const [user, setUser] = useState(null)
-  const [authLoading, setAuthLoading] = useState(true)
+  const [setAuthLoading] = useState(true)
 
   // 초기값 로드
   const [routines, setRoutines] = useState(() => {
