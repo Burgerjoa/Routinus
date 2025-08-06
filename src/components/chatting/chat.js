@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { collection, addDoc, onSnapshot, orderBy, query, serverTimestamp } from 'firebase/firestore'
-import { db } from './firebase'
+import { db, auth } from './firebase'
 import './chat.css'
 
 function Chat({user}) {
@@ -8,6 +8,9 @@ function Chat({user}) {
   const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
   const [userName, setUserName] = useState('')
+
+  const userLoginTime = new Date();
+  const currentUser = auth.currentUser;
 
   // timestamp를 문자열로 변환하는 함수
   const formatTimestamp = (timestamp) => {
@@ -51,7 +54,8 @@ function Chat({user}) {
         await addDoc(collection(db, 'messages'), {
           text: newMessage,
           user: userName,
-          timestamp: serverTimestamp()
+          timestamp: serverTimestamp(),
+          id: currentUser.uid,
         })
         setNewMessage('')
       } catch (error) {
@@ -70,15 +74,22 @@ function Chat({user}) {
     <div className="chat-container">
       <h1>Routinus 루틴 공유방</h1>
       <button onClick={() => setUserName(prompt('닉네임을 입력하세요:'))}>닉네임 설정</button>
-      <p>현재 내 닉네임 : {userName}</p>
+      <div className='userinfo'>
+        <p className='nickname-section'>현재 내 닉네임 : {userName}</p>
+        <p className='login-time-info'>접속 시간 : {userLoginTime.toLocaleTimeString()}</p>
+      </div>
 
       {/* 메시지 목록 */}
       <div className="messages-container">
         {messages.map(message => (
-          <div key={message.id} className="message">
-            <span className="message-user">{message.user}:</span>
-            <span className="message-text">{message.text}</span>
-            <span className="message-time">{formatTimestamp(message.timestamp)}</span>
+          <div key={message.id} className={`message ${message.id === currentUser.uid ? 'my-message' : 'other-message'}`}>
+            <div className="message-info">
+              <span className="message-user">{message.user}</span>
+              <span className="message-time">{formatTimestamp(message.timestamp)}</span>
+            </div>
+            <div className="message-bubble">
+              <div className="message-text">{message.text}</div>
+            </div>
           </div>
         ))}
       </div>

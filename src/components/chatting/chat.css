@@ -2,80 +2,237 @@
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
-  font-family: Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.user-input {
-  margin-bottom: 20px;
+.user-info {
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 14px;
 }
 
-.user-name-input {
+.nickname-section {
+  background-color: #f8f9fa;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+.nickname-section label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #333;
+  font-size: 14px;
+}
+
+.nickname-input {
   width: 100%;
-  padding: 10px;
+  padding: 8px 12px;
   border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 16px;
-  margin-bottom: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+  margin-bottom: 4px;
+}
+
+.nickname-section small {
+  color: #666;
+  font-size: 11px;
+}
+
+.login-time-info {
+  text-align: center;
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 15px;
+  padding: 8px;
+  background-color: #f0f0f0;
+  border-radius: 15px;
 }
 
 .messages-container {
-  height: 400px;
+  flex: 1;
   overflow-y: auto;
-  border: 1px solid #ddd;
-  border-radius: 5px;
   padding: 10px;
-  margin-bottom: 20px;
-  background-color: #f9f9f9;
+  margin-bottom: 15px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
 }
 
 .message {
-  margin-bottom: 10px;
-  padding: 8px;
-  background-color: white;
-  color: black;
-  border-radius: 5px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  clear: both;
+}
+
+/* 자신의 메시지 (오른쪽) */
+.message.my-message {
+  align-items: flex-end;
+}
+
+.message.my-message .message-bubble {
+  background: linear-gradient(135deg, #c045f5, #d070eb);
+  color: white;
+  border-radius: 18px 18px 4px 18px;
+  max-width: 70%;
+  margin-right: 10px;
+}
+
+.message.my-message .message-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: -6px;
+  width: 0;
+  height: 0;
+  border: 8px solid transparent;
+  border-top-color: #d070eb;
+  border-right: none;
+  transform: rotate(-45deg);
+}
+
+/* 다른 사람의 메시지 (왼쪽) */
+.message.other-message {
+  align-items: flex-start;
+}
+
+.message.other-message .message-bubble {
+  background-color: #f1f3f4;
+  color: #333;
+  border-radius: 18px 18px 18px 4px;
+  max-width: 70%;
+  margin-left: 10px;
+}
+
+.message.other-message .message-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -8px;
+  width: 0;
+  height: 0;
+  border: 8px solid transparent;
+  border-top-color: #f1f3f4;
+  border-left: none;
+  transform: rotate(45deg);
+}
+
+.message-bubble {
+  position: relative;
+  padding: 12px 16px;
+  margin: 2px 0;
+  word-wrap: break-word;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.message-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: #666;
+}
+
+.message.my-message .message-info {
+  flex-direction: row-reverse;
+  margin-right: 10px;
+}
+
+.message.other-message .message-info {
+  margin-left: 10px;
 }
 
 .message-user {
-  font-weight: bold;
-  color: #007bff;
-  margin-right: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.message.my-message .message-user {
+  color: #000000;
 }
 
 .message-text {
-  margin-right: 8px;
+  font-size: 15px;
+  line-height: 1.4;
 }
 
 .message-time {
-  font-size: 12px;
-  color: #666;
-  float: right;
+  font-size: 11px;
+  color: #999;
+  margin: 0 8px;
+}
+
+.no-messages {
+  text-align: center;
+  color: #999;
+  padding: 40px 20px;
+  font-style: italic;
+  font-size: 14px;
 }
 
 .message-input-container {
   display: flex;
   gap: 10px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 25px;
+  border: 1px solid #e0e0e0;
 }
 
 .message-input {
   flex: 1;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 16px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 20px;
+  font-size: 15px;
+  background-color: white;
+  outline: none;
 }
 
 .send-button {
-  padding: 10px 20px;
-  background-color: #007bff;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #b516ff, #d82cff);
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 20px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: transform 0.2s ease;
 }
 
 .send-button:hover {
-  background-color: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+}
+
+.send-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 스크롤바 스타일링 */
+.messages-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.messages-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.messages-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
