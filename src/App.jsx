@@ -1,18 +1,43 @@
 // src/App.jsx
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react' // useEffect 추가
 import Header          from './components/common/Header/Header'
 import RoutineList     from './components/routine/RoutineList/RoutineList'
 import AddRoutineModal from './components/routine/AddroutineModal/AddRoutineModal'
 import BottomNav       from './components/common/BottomNav/BottomNav'
 import styles          from './App.css'
 
+const STORAGE_KEY = 'routinus-routines' // 로컬스토리지 키 상수
+
 export default function App() {
   const [currentTab, setCurrentTab] = useState('routine')
-  const [routines, setRoutines]     = useState([
-    { id: 1, title: '기상', time: '9:00 오전', streak: 314, done: false },
-    { id: 2, title: '운동', time: '5:00 오후', streak: 314, done: true  },
-  ])
-  const [modalOpen, setModalOpen]   = useState(false)
+
+  // 초기값 로드
+  const [routines, setRoutines] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      return saved ? JSON.parse(saved) : [
+        { id: 1, title: '기상', time: '9:00 오전', streak: 314, done: false },
+        { id: 2, title: '운동', time: '5:00 오후', streak: 314, done: true  },
+      ]
+    } catch (error) {
+      console.error('로컬스토리지 데이터 로드 실패:', error)
+      return [
+        { id: 1, title: '기상', time: '9:00 오전', streak: 314, done: false },
+        { id: 2, title: '운동', time: '5:00 오후', streak: 314, done: true  },
+      ]
+    }
+  })
+
+  const [modalOpen, setModalOpen] = useState(false)
+
+  // 로컬스토리지에 저장
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(routines))
+    } catch (error) {
+      console.error('로컬스토리지 저장 실패:', error)
+    }
+  }, [routines]) // routines가 변경될 때마다 실행
 
   // 루틴 추가
   const handleAdd = formValues => {
@@ -38,6 +63,7 @@ export default function App() {
         <>
           <Header
             date={new Date().toLocaleDateString('ko-KR', {
+              year: 'numeric',
               month:   '2-digit',
               day:     '2-digit',
               weekday: 'short'

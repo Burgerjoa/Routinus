@@ -4,12 +4,14 @@ import styles from './Header.module.css'
 export default function Header({ date, doneCount, pendingCount, onAddClick }) {
   return (
     <header className={styles.header}>
+      <div className={styles.headerTop}>
       <div className={styles.date}>{date}</div>
       <div className={styles.counts}>
-        <button onClick={onAddClick}>루틴 추가</button>
-        <button className={styles.done}>완료 {doneCount}</button>
-        <button className={styles.pending}>미완료 {pendingCount}</button>
+        <button className={styles.done}>{doneCount}<br/> 완료</button>
+        <button className={styles.pending}>{pendingCount}<br/> 미완료</button>
       </div>
+      </div>
+      <button className={styles.addButton} onClick={onAddClick}>+</button>
     </header>
   )
 }
