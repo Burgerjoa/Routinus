@@ -1,16 +1,21 @@
 // src/App.jsx
 import React, { useState, useEffect } from 'react' // useEffect 추가
+import { onAuthStateChanged } from 'firebase/auth'
+import { auth } from './components/chatting/firebase' // Firebase 인증 가져오기
 import Header          from './components/common/Header/Header'
 import RoutineList     from './components/routine/RoutineList/RoutineList'
 import AddRoutineModal from './components/routine/AddroutineModal/AddRoutineModal'
 import BottomNav       from './components/common/BottomNav/BottomNav'
 import styles          from './App.css'
 import ChatList        from './components/chatting/chat' // 채팅 컴포넌트 임포트
+import Login           from './components/login/login' // 로그인 컴포넌트 임포트
 
 const STORAGE_KEY = 'routinus-routines' // 로컬스토리지 키 상수
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState('routine')
+  const [user, setUser] = useState(null)
+  const [authLoading, setAuthLoading] = useState(true)
 
   // 초기값 로드
   const [routines, setRoutines] = useState(() => {
@@ -56,6 +61,21 @@ export default function App() {
   // 완료/미완료 카운트
   const doneCount    = routines.filter(r => r.done).length
   const pendingCount = routines.length - doneCount
+
+  // 인증 상태 확인
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser)
+      setAuthLoading(false)
+    })
+    
+    return () => unsubscribe()
+  }, [])
+
+  // 로그인되지 않은 경우 로그인 페이지 표시
+  if (!user) {
+    return <Login />
+  }
 
   return (
     <div className={styles.appContainer}>
