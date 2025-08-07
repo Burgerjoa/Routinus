@@ -7,13 +7,11 @@ export default function RoutineItem({ routine, onRemove, onToggle }) {
 
   return (
     <div className={styles.item}>
-      <div className={styles.timeline}>
         <button
           className={`${styles.dot} ${done ? styles.dotActive : ''}`}
           onClick={onToggle}
         />
         <div className={styles.line} />
-      </div>
       <div className={styles.content}>
         <div className={styles.title}>{title}</div>
         <div className={styles.meta}>{time} • {streak}일 연속</div>
