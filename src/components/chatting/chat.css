@@ -1,13 +1,28 @@
 .chat-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
+  height: 87vh;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.chat-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+.userinfo {
   display: flex;
   flex-direction: column;
 }
 
+/* feature/routine-share 브랜치에서 추가된 스타일 */
 .chat-header-button {
   display: flex;
   justify-content: space-between;
@@ -56,23 +71,25 @@
   white-space: nowrap;
 }
 
-.user-info {
+/* main 브랜치에서 추가된 스타일 (일부 중복 제거) */
+.user-header-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  font-size: 14px;
+  padding: 4px 0;
+  border-bottom: 1px solid #eee;
+  background: #faf7ff;
+  border-radius: 12px;
 }
 
 .nickname-section {
   background-color: #f8f9fa;
-  padding: 12px;
-  border-radius: 12px;
-  margin-bottom: 15px;
 }
 
 .nickname-section label {
   display: block;
   font-weight: 600;
-  margin-bottom: 6px;
   color: #333;
   font-size: 14px;
 }
@@ -96,8 +113,6 @@
   text-align: center;
   font-size: 12px;
   color: #999;
-  margin-bottom: 15px;
-  padding: 8px;
   background-color: #f0f0f0;
   border-radius: 15px;
 }
@@ -276,7 +291,7 @@
   cursor: not-allowed;
 }
 
-.button-container{
+.button-container {
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -303,8 +318,6 @@
 }
 
 /* 공유 모달 스타일 */
-
-/* 모달 오버레이 */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -318,7 +331,6 @@
   z-index: 1000;
 }
 
-/* 모달 컨테이너 */
 .modal-container {
   background-color: white;
   border-radius: 12px;
@@ -331,7 +343,6 @@
   position: relative;
 }
 
-/* 모달 헤더 */
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -348,7 +359,6 @@
   color: #333;
 }
 
-/* 모달 닫기 버튼 */
 .modal-close-button {
   background: none;
   border: none;
@@ -370,12 +380,10 @@
   color: #333;
 }
 
-/* 모달 바디 */
 .modal-body {
   margin-bottom: 20px;
 }
 
-/* 모달 푸터 */
 .modal-footer {
   display: flex;
   justify-content: flex-end;
@@ -494,7 +502,6 @@
   display: inline-block;
   width: 200px;
 }
-
 
 /* 드롭다운 스타일 */
 .dropdown-trigger {
@@ -667,99 +674,51 @@
   margin: 10px 0;
 }
 
-
-/* 루틴 공유 메시지 스타일 */
-.routine-share-message {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-radius: 12px;
-  padding: 16px;
-  margin: 12px 10px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  max-width: 90%;
-}
-
-.message.my-message .routine-share-message {
-  margin-left: auto;
-  margin-right: 10px;
-}
-
-.message.other-message .routine-share-message {
-  margin-left: 10px;
-  margin-right: auto;
-}
-
-.routine-share-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  font-size: 14px;
-}
-
-.share-user {
-  font-weight: bold;
-  font-size: 16px;
-}
-
-.routine-share-content h4 {
-  margin: 0 0 8px 0;
-  font-size: 18px;
-  color: #fff;
-}
-
-.routine-share-content p {
-  margin: 0 0 12px 0;
-  opacity: 0.9;
-  font-size: 14px;
-}
-
-.exercises-info {
-  margin: 8px 0;
-  opacity: 0.8;
-}
-
-.exercises-info small {
-  font-size: 12px;
-}
-
-.join-routine-button {
-  background-color: rgba(255,255,255,0.2);
-  color: white;
-  border: 2px solid white;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s ease;
-  font-size: 14px;
-}
-
-.join-routine-button:hover {
-  background-color: white;
-  color: #667eea;
-}
-
-.join-routine-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.own-routine {
-  background-color: rgba(255,255,255,0.2);
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 14px;
-  display: inline-block;
-}
-
-.system-message {
+/* 추가된 스타일 */
+.message-divider {
+  position: relative;
   text-align: center;
-  background-color: #f0f0f0;
+  margin: 30px 0;
+}
+
+.message-divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #c084fc;
+  z-index: 1;
+}
+
+.message-divider span {
+  position: relative;
+  display: inline-block;
   padding: 8px 16px;
-  border-radius: 20px;
-  font-style: italic;
-  color: #666;
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 15px;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(155, 89, 182, 0.3);
+}
+
+.nickname-button {
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 15px;
   font-size: 14px;
-  margin: 10px 0;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.nickname-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(155, 89, 182, 0.4);
 }

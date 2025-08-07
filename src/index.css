@@ -11,3 +11,23 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* CSS 리셋 코드 */
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-sizing: border-box; /* 패딩과 보더가 너비/높이에 포함되도록 설정 */
+  font-family: inherit; /* 폰트 스타일 상속 */
+}
+
+/* 목록 스타일 초기화 */
+ul, ol {
+  list-style: none;
+}
+
+/* 링크 스타일 초기화 */
+a {
+  color: inherit;
+  text-decoration: none;
+}
