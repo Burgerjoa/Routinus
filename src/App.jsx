@@ -1,4 +1,3 @@
-// src/App.jsx
 import React, { useState, useEffect } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
 import {
@@ -12,13 +11,13 @@ import {
   updateDoc
 } from 'firebase/firestore'
 import { auth, db } from './components/firebase/firebase'
-import Header          from './components/common/Header/Header'
-import RoutineList     from './components/routine/RoutineList/RoutineList'
+import Header from './components/common/Header/Header'
+import RoutineList from './components/routine/RoutineList/RoutineList'
 import AddRoutineModal from './components/routine/AddroutineModal/AddRoutineModal'
-import BottomNav       from './components/common/BottomNav/BottomNav'
-import styles          from './App.module.css'
-import ChatList        from './components/chatting/chat'
-import Login           from './components/login/login'
+import BottomNav from './components/common/BottomNav/BottomNav'
+import styles from './App.module.css'
+import ChatList from './components/chatting/chat'
+import Login from './components/login/login'
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState('routine')
@@ -33,7 +32,6 @@ export default function App() {
       setUser(currentUser)
       setAuthLoading(false)
     })
-
     return () => unsubscribe()
   }, [])
 
@@ -65,7 +63,6 @@ export default function App() {
     return () => unsubscribe()
   }, [user]) // user가 변경될 때마다 실행
 
-
   // 루틴 추가 함수 (사용자 ID 포함)
   const handleAdd = async (formValues) => {
     if (!user) {
@@ -80,8 +77,8 @@ export default function App() {
         time: formValues.time,
         streak: 0,
         done: false,
-        userId: user.uid,           // 현재 사용자 ID
-        userEmail: user.email,      // 디버깅용 (선택사항)
+        userId: user.uid,
+        userEmail: user.email,
         createdAt: new Date()
       })
 
@@ -156,7 +153,6 @@ export default function App() {
             pendingCount={pendingCount}
             onAddClick={() => setModalOpen(true)}
           />
-
           <div style={{ flexGrow: 1, overflowY: 'auto' }}>
             <RoutineList
               routines={routines}
@@ -164,7 +160,6 @@ export default function App() {
               onToggleDone={handleToggle}
             />
           </div>
-
           {modalOpen && (
             <AddRoutineModal
               onClose={() => setModalOpen(false)}

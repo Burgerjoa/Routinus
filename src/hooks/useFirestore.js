@@ -8,7 +8,7 @@ import {
   deleteDoc,
   onSnapshot
 } from 'firebase/firestore'
-import { db } from '../firebase'
+import { db } from '../components/firebase/firebase'
 
 export const useFirestore = () => {
   // 루틴 추가
@@ -17,7 +17,10 @@ export const useFirestore = () => {
       const docRef = await addDoc(collection(db, 'routines'), {
         ...routine,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        userId: routine.userId,
+        isShared: false,
+        isParticipant: false
       })
       return { id: docRef.id, ...routine }
     } catch (error) {
