@@ -94,7 +94,6 @@ const getMessageDate = (message) => {
 
   const { oldMessages, newMessages } = messages.reduce((acc, message) => {
     const messageDate = getMessageDate(message);
-    console.log(messageDate, userLoginTime)
 
     if (messageDate > userLoginTime) {
       acc.newMessages.push(message)
