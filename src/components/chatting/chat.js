@@ -118,12 +118,20 @@ const getMessageDate = (message) => {
 
   return (
     <div className="chat-container">
-      <h1>Routinus 루틴 공유방</h1>
-      <button className="nickname-button" onClick={handleNicknameChange}>닉네임 설정</button>
-      <div className='userinfo'>
-        <p className='nickname-section'>현재 내 닉네임 : {userName}</p>
-        <p className='login-time-info'>접속 시간 : {userLoginTime.toLocaleTimeString()}</p>
+      <h1 className='chat-title'>Routinus 루틴 공유방</h1>
+      <div className="user-header-card">
+        <button className="nickname-button" onClick={handleNicknameChange}>
+          닉네임 설정
+        </button>
+        <div className="userinfo">
+          <p className="nickname-section">
+            <span>현재 내 닉네임 :</span> <strong>{userName}</strong>
+          </p>
+        </div>
       </div>
+      <p className="login-time-info">
+            접속 시간 : {userLoginTime.toLocaleTimeString()}
+          </p>
 
       {/* 메시지 목록 */}
       <div className="messages-container">

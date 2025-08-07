@@ -1,30 +1,45 @@
 .chat-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
+  height: 90vh;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.chat-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin: 0; /* 기본 마진 제거 */
+  padding: 0;
+}
+
+.userinfo {
   display: flex;
   flex-direction: column;
 }
 
-.user-info {
+.user-header-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  font-size: 14px;
+  padding: 4px 0;
+  border-bottom: 1px solid #eee;
+  background: #faf7ff;
+  border-radius: 12px;
 }
 
 .nickname-section {
   background-color: #f8f9fa;
-  padding: 12px;
-  border-radius: 12px;
-  margin-bottom: 15px;
 }
 
 .nickname-section label {
   display: block;
   font-weight: 600;
-  margin-bottom: 6px;
   color: #333;
   font-size: 14px;
 }
@@ -48,8 +63,6 @@
   text-align: center;
   font-size: 12px;
   color: #999;
-  margin-bottom: 15px;
-  padding: 8px;
   background-color: #f0f0f0;
   border-radius: 15px;
 }
@@ -276,8 +289,6 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 10px;
-  margin-bottom: 15px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   transition: transform 0.2s ease;
 }
