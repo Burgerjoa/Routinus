@@ -21,8 +21,6 @@ import styles          from './App.module.css'
 import ChatList        from './components/chatting/chat'
 import Login           from './components/login/login'
 
-const STORAGE_KEY = 'routinus-routines'
-
 export default function App() {
   const [currentTab, setCurrentTab] = useState('routine')
   const [user, setUser] = useState(null)
