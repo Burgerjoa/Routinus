@@ -4,7 +4,6 @@ import { onAuthStateChanged } from 'firebase/auth'
 import {
   addDoc,
   collection,
-  getDocs,
   query,
   where,
   onSnapshot,
@@ -66,76 +65,6 @@ export default function App() {
     return () => unsubscribe()
   }, [user]) // user가 변경될 때마다 실행
 
-  // useEffect 3: 개발용 전역 함수 등록
-  useEffect(() => {
-    window.checkFirestoreData = async () => {
-      try {
-        // 모든 루틴 데이터 확인
-        const snapshot = await getDocs(collection(db, 'routines'))
-        const allData = []
-        snapshot.forEach(doc => {
-          allData.push({ id: doc.id, ...doc.data() })
-        })
-        console.table(allData)
-        return allData
-      } catch (error) {
-        console.error('데이터 확인 실패:', error)
-        return []
-      }
-    }
-
-    window.checkMyRoutines = async () => {
-      if (!user) {
-        console.log('로그인이 필요합니다')
-        return []
-      }
-
-      try {
-        // 현재 사용자의 루틴만 확인
-        const q = query(
-          collection(db, 'routines'),
-          where('userId', '==', user.uid)
-        )
-        const snapshot = await getDocs(q)
-        const myData = []
-        snapshot.forEach(doc => {
-          myData.push({ id: doc.id, ...doc.data() })
-        })
-        console.table(myData)
-        console.log(`${user.email}의 루틴: ${myData.length}개`)
-        return myData
-      } catch (error) {
-        console.error('내 루틴 확인 실패:', error)
-        return []
-      }
-    }
-
-    window.addTestData = async () => {
-      if (!user) {
-        console.log('로그인이 필요합니다')
-        return
-      }
-
-      try {
-        const docRef = await addDoc(collection(db, 'routines'), {
-          title: '테스트 루틴',
-          time: '09:00',
-          streak: 0,
-          done: false,
-          userId: user.uid, // 사용자 ID 추가
-          userEmail: user.email, // 디버깅용
-          createdAt: new Date()
-        })
-        console.log('✅ 테스트 데이터 추가 완료:', docRef.id)
-
-        setTimeout(() => window.checkMyRoutines(), 1000)
-
-        return docRef.id
-      } catch (error) {
-        console.error('❌ 테스트 데이터 추가 실패:', error)
-      }
-    }
-  }, [user])
 
   // 루틴 추가 함수 (사용자 ID 포함)
   const handleAdd = async (formValues) => {
@@ -213,20 +142,6 @@ export default function App() {
 
   return (
     <div className={styles.appContainer}>
-      {/* 개발용 정보 표시 */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        right: 0,
-        background: 'rgba(0,0,0,0.8)',
-        color: 'white',
-        padding: '4px 8px',
-        fontSize: '12px',
-        zIndex: 999
-      }}>
-        {user.email} | 루틴 {routines.length}개
-      </div>
-
       {/* ===== 루틴 탭 ===== */}
       {currentTab === 'routine' && (
         <>
@@ -242,18 +157,20 @@ export default function App() {
             onAddClick={() => setModalOpen(true)}
           />
 
-          <RoutineList
-            routines={routines}
-            onRemove={handleRemove}
-            onToggleDone={handleToggle}
-          />
+          <div style={{ flexGrow: 1, overflowY: 'auto' }}>
+            <RoutineList
+              routines={routines}
+              onRemove={handleRemove}
+              onToggleDone={handleToggle}
+            />
+          </div>
 
           {modalOpen && (
             <AddRoutineModal
               onClose={() => setModalOpen(false)}
               onSave={(formValues) => {
-                handleAdd(formValues)
-                setModalOpen(false)
+                handleAdd(formValues);
+                setModalOpen(false);
               }}
             />
           )}
@@ -262,7 +179,7 @@ export default function App() {
 
       {/* ===== 채팅 탭 ===== */}
       {currentTab === 'chat' && (
-        <div style={{ padding: 16 }}>
+        <div style={{ flexGrow: 1, overflowY: 'auto', padding: 16 }}>
           <ChatList user={user} />
         </div>
       )}
