@@ -26,7 +26,7 @@ function Chat({user}) {
 
   useEffect(() => {
     if (user) {
-      setUserName(user.email)
+      setUserName(user.email.replace(/@.*/, '')) // 이메일에서 @ 이후 제거
     }
   }, [user])
 
