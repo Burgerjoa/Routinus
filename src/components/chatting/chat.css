@@ -597,3 +597,169 @@
 .dropdown-item.disabled:hover {
   background-color: transparent;
 }
+
+
+/* 루틴 공유 메시지 스타일 */
+.routine-share-message {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 12px 0;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.routine-share-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.share-user {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.routine-share-content h4 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #fff;
+}
+
+.routine-share-content p {
+  margin: 0 0 12px 0;
+  opacity: 0.9;
+}
+
+.join-routine-button {
+  background-color: rgba(255,255,255,0.2);
+  color: white;
+  border: 2px solid white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.join-routine-button:hover {
+  background-color: white;
+  color: #667eea;
+}
+
+.own-routine {
+  background-color: rgba(255,255,255,0.2);
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.system-message {
+  text-align: center;
+  background-color: #f0f0f0;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-style: italic;
+  color: #666;
+  font-size: 14px;
+  margin: 10px 0;
+}
+
+
+/* 루틴 공유 메시지 스타일 */
+.routine-share-message {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 12px 10px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  max-width: 90%;
+}
+
+.message.my-message .routine-share-message {
+  margin-left: auto;
+  margin-right: 10px;
+}
+
+.message.other-message .routine-share-message {
+  margin-left: 10px;
+  margin-right: auto;
+}
+
+.routine-share-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.share-user {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.routine-share-content h4 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #fff;
+}
+
+.routine-share-content p {
+  margin: 0 0 12px 0;
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+.exercises-info {
+  margin: 8px 0;
+  opacity: 0.8;
+}
+
+.exercises-info small {
+  font-size: 12px;
+}
+
+.join-routine-button {
+  background-color: rgba(255,255,255,0.2);
+  color: white;
+  border: 2px solid white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.join-routine-button:hover {
+  background-color: white;
+  color: #667eea;
+}
+
+.join-routine-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.own-routine {
+  background-color: rgba(255,255,255,0.2);
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  display: inline-block;
+}
+
+.system-message {
+  text-align: center;
+  background-color: #f0f0f0;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-style: italic;
+  color: #666;
+  font-size: 14px;
+  margin: 10px 0;
+}
