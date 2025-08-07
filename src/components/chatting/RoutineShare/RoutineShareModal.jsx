@@ -9,16 +9,37 @@ function RoutineShareModal({ onClose, currentChatRoom }) {
   useEffect(() => {
     const fetchRoutines = async () => {
       if (!user) return;
-      
-      const q = query(
-        collection(db, "routines"), 
-        where("ownerId", "==", user.uid), 
-        where("isShared", "==", false)
-      );
 
-      const snapshot = await getDocs(q);
-      setRoutines(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      try {
+        // 실제 데이터 구조에 맞는 쿼리
+        const q = query(
+          collection(db, "routines"),
+          where("userId", "==", user.uid)
+        );
+
+        const snapshot = await getDocs(q);
+        const allUserRoutines = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        console.log("사용자의 모든 루틴:", allUserRoutines);
+
+        // JavaScript에서 필터링
+        const shareableRoutines = allUserRoutines.filter((routine) => {
+          // isShared 필드가 없거나 false인 것만
+          const isNotShared = routine.isShared !== true;
+          console.log(`루틴 ${routine.title}: isShared=${routine.isShared}, 공유가능=${isNotShared}`);
+          return isNotShared;
+        });
+
+        console.log("공유 가능한 루틴:", shareableRoutines);
+        setRoutines(shareableRoutines);
+      } catch (error) {
+        console.error("루틴 조회 실패:", error);
+      }
     };
+
     fetchRoutines();
   }, [user]);
 
@@ -32,43 +53,41 @@ function RoutineShareModal({ onClose, currentChatRoom }) {
         sharedByName: user.email,
         sharedAt: serverTimestamp(),
         participants: [user.uid],
-        isActive: true
       });
 
       // 전체 채팅에 공유 메시지 전송
-      await addDoc(collection(db, 'messages'), {
+      await addDoc(collection(db, "messages"), {
         type: "routine_share",
         routineId: routine.id,
         sharedRoutineId: sharedRoutineRef.id,
         routineTitle: routine.title,
-        routineDescription: routine.description,
         routineExercises: routine.exercises || [],
         text: `${user.displayName || user.email}님이 "${routine.title}" 루틴을 공유했습니다.`,
         timestamp: serverTimestamp(),
         user: user.email,
-        userId: user.uid
+        userId: user.uid,
       });
 
-      // 4. 루틴 채팅방 생성 및 초기 메시지
+      // 루틴 채팅방 생성 및 초기 메시지
       const chatRoomId = `routine-${sharedRoutineRef.id}`;
       await addDoc(collection(db, `chat_rooms/${chatRoomId}/messages`), {
         text: `"${routine.title}" 루틴 채팅방이 생성되었습니다.`,
-        user: 'System',
-        userId: 'system',
+        user: "System",
+        userId: "system",
         timestamp: serverTimestamp(),
-        type: 'system'
+        type: "system",
       });
 
-      // 5. 원본 루틴 공유됨으로 표시
+      // 원본 루틴 공유됨으로 표시
       await updateDoc(doc(db, "routines", routine.id), {
-        isShared: true
+        isShared: true,
       });
 
-      alert('루틴이 성공적으로 공유되었습니다!');
+      alert("루틴이 성공적으로 공유되었습니다!");
       onClose();
     } catch (error) {
       console.error("루틴 공유 실패", error);
-      alert('루틴 공유에 실패했습니다.');
+      alert("루틴 공유에 실패했습니다.");
     }
   };
 
@@ -101,10 +120,7 @@ function RoutineShareModal({ onClose, currentChatRoom }) {
                       </div>
                     )}
                   </div>
-                  <button 
-                    onClick={() => handleShare(routine)} 
-                    className="modal-button modal-button-primary share-button"
-                  >
+                  <button onClick={() => handleShare(routine)} className="modal-button modal-button-primary share-button">
                     공유하기
                   </button>
                 </div>
