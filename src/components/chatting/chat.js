@@ -9,7 +9,7 @@ function Chat({user}) {
   const [newMessage, setNewMessage] = useState('')
   const [userName, setUserName] = useState('default')
 
-  const userLoginTime = new Date();
+  const userLoginTime = new Date(user.metadata.lastSignInTime); // 실제 로그인 시간
   const currentUser = auth.currentUser;
 
   // timestamp를 문자열로 변환하는 함수
@@ -80,10 +80,36 @@ function Chat({user}) {
     }
   }
 
+  // 메시지 타임스탬프를 Date 객체로 변환하는 함수 추가
+const getMessageDate = (message) => {
+  if (!message.timestamp) return new Date(0);
+  if (message.timestamp.toDate) {
+    return message.timestamp.toDate();
+  }
+  if (typeof message.timestamp === 'object' && message.timestamp.seconds) {
+    return new Date(message.timestamp.seconds * 1000);
+  }
+  return new Date(0);
+};
+
+  const { oldMessages, newMessages } = messages.reduce((acc, message) => {
+    const messageDate = getMessageDate(message);
+    console.log(messageDate, userLoginTime)
+
+    if (messageDate > userLoginTime) {
+      acc.newMessages.push(message)
+    } else {
+      acc.oldMessages.push(message)
+    }
+    return acc
+  }, { oldMessages: [], newMessages: [] });
+
+  const hasOldMessages = oldMessages.length > 0;
+
   return (
     <div className="chat-container">
       <h1>Routinus 루틴 공유방</h1>
-      <button onClick={handleNicknameChange}>닉네임 설정</button>
+      <button className="nickname-button" onClick={handleNicknameChange}>닉네임 설정</button>
       <div className='userinfo'>
         <p className='nickname-section'>현재 내 닉네임 : {userName}</p>
         <p className='login-time-info'>접속 시간 : {userLoginTime.toLocaleTimeString()}</p>
@@ -91,7 +117,8 @@ function Chat({user}) {
 
       {/* 메시지 목록 */}
       <div className="messages-container">
-        {messages.map(message => (
+        {/* 이전 메세지 */}
+        {hasOldMessages && oldMessages.map(message => (
           <div key={message.id} className={`message ${message.id === currentUser.uid ? 'my-message' : 'other-message'}`}>
             <div className="message-info">
               <span className="message-user">{message.user}</span>
@@ -102,6 +129,25 @@ function Chat({user}) {
             </div>
           </div>
         ))}
+
+        {/* 구분선 */}
+        <div className="message-divider">
+          <span>⬆️과거의 메세지⬆️</span>
+        </div>
+
+        {/* 새 메세지 */}
+        {newMessages.map(message => (
+          <div key={message.id} className={`message ${message.id === currentUser.uid ? 'my-message' : 'other-message'}`}>
+            <div className="message-info">
+              <span className="message-user">{message.user}</span>
+              <span className="message-time">{formatTimestamp(message.timestamp)}</span>
+            </div>
+            <div className="message-bubble">
+              <div className="message-text">{message.text}</div>
+            </div>
+          </div>
+        ))}
+
       </div>
 
       {/* 새 메시지 입력 */}
