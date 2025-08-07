@@ -30,6 +30,17 @@ function Chat({user}) {
     }
   }, [user])
 
+  useEffect(() => {
+  // messages-container와 message-divider DOM 찾기
+  const container = document.querySelector('.messages-container');
+  const divider = document.querySelector('.message-divider');
+  if (container && divider) {
+    // divider가 container 내부에 있으면 스크롤 이동
+    const dividerOffset = divider.offsetTop - container.offsetTop;
+    container.scrollTop = dividerOffset;
+  }
+}, [messages]);
+
   // Firebase에서 메시지 실시간 구독
   useEffect(() => {
     const q = query(
@@ -55,7 +66,7 @@ function Chat({user}) {
           text: newMessage,
           user: userName,
           timestamp: serverTimestamp(),
-          id: currentUser.uid,
+          userId: currentUser.uid,
         })
         setNewMessage('')
       } catch (error) {
@@ -118,7 +129,7 @@ const getMessageDate = (message) => {
       <div className="messages-container">
         {/* 이전 메세지 */}
         {hasOldMessages && oldMessages.map(message => (
-          <div key={message.id} className={`message ${message.id === currentUser.uid ? 'my-message' : 'other-message'}`}>
+          <div key={message.userId + message.timestamp} className={`message ${message.userId === currentUser.uid ? 'my-message' : 'other-message'}`}>
             <div className="message-info">
               <span className="message-user">{message.user}</span>
               <span className="message-time">{formatTimestamp(message.timestamp)}</span>
@@ -136,7 +147,7 @@ const getMessageDate = (message) => {
 
         {/* 새 메세지 */}
         {newMessages.map(message => (
-          <div key={message.id} className={`message ${message.id === currentUser.uid ? 'my-message' : 'other-message'}`}>
+          <div key={message.userId + message.timestamp} className={`message ${message.userId === currentUser.uid ? 'my-message' : 'other-message'}`}>
             <div className="message-info">
               <span className="message-user">{message.user}</span>
               <span className="message-time">{formatTimestamp(message.timestamp)}</span>
