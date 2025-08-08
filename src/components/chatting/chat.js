@@ -58,6 +58,16 @@ function Chat({ user }) {
     }
   }, [user]);
 
+  useEffect(() => {
+  // 페이지가 렌더링된 후 message-divider 위치로 스크롤 이동
+  const container = document.querySelector('.messages-container');
+  const divider = document.querySelector('.message-divider');
+  if (container && divider) {
+    const dividerOffset = divider.offsetTop - container.offsetTop;
+    container.scrollTop = dividerOffset;
+  }
+}, [messages]);
+
   // 참여하고 있는 루틴 목록 가져오기 추가
   useEffect(() => {
     const fetchJoinedRoutines = async () => {

@@ -1,6 +1,6 @@
 import { db, auth } from "../../firebase/firebase";
 import { useEffect, useState } from "react";
-import { collection, getDocs, addDoc, serverTimestamp, doc, query, where, updateDoc, onSnapshot } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, doc, query, where, updateDoc, onSnapshot } from "firebase/firestore";
 
 function RoutineShareModal({ onClose, currentChatRoom,onRoutineShared }) {
   const [routines, setRoutines] = useState([]);
