@@ -35,38 +35,28 @@ function Chat({ user }) {
     return String(timestamp);
   };
 
-    const handleRoutineShared = (chatRoomId, routineInfo) => {
+  const handleRoutineShared = (chatRoomId, routineInfo) => {
     // 참여 루틴 목록에 새로 공유한 루틴 추가
-    setJoinedRoutines(prev => {
-      const exists = prev.some(r => r.id === routineInfo.id);
+    setJoinedRoutines((prev) => {
+      const exists = prev.some((r) => r.id === routineInfo.id);
       if (!exists) {
         return [...prev, routineInfo];
       }
       return prev;
     });
-    
+
     // 해당 채팅방으로 즉시 이동
     setCurrentChatRoom(chatRoomId);
-    
+
     console.log(`채팅방 이동: ${chatRoomId}`);
   };
 
   // props로 받은 user 정보로 userName 설정
   useEffect(() => {
     if (user) {
-      setUserName(user.email.replace(/@.*/, ''));
+      setUserName(user.email.replace(/@.*/, ""));
     }
   }, [user]);
-
-  useEffect(() => {
-  // 페이지가 렌더링된 후 message-divider 위치로 스크롤 이동
-  const container = document.querySelector('.messages-container');
-  const divider = document.querySelector('.message-divider');
-  if (container && divider) {
-    const dividerOffset = divider.offsetTop - container.offsetTop;
-    container.scrollTop = dividerOffset;
-  }
-}, [messages]);
 
   // 참여하고 있는 루틴 목록 가져오기 추가
   useEffect(() => {
@@ -79,54 +69,65 @@ function Chat({ user }) {
       try {
         const routines = [];
 
-        //내가 공유한 루틴 shared_routines 컬렉션에서 직접 조회
-        const q = query(
-          collection(db, "shared_routines"),
-          where("sharedBy", "==", user.uid)
-        );
+        //내가 공유한 루틴 shared_routines 컬렉션에서 직접
+        const q = query(collection(db, "shared_routines"), where("sharedBy", "==", user.uid));
 
         const sharedsnapshot = await getDocs(q);
-
 
         sharedsnapshot.docs.forEach((doc) => {
           const data = doc.data();
 
           //공유한 루틴
-          if(data.shareRoutineId) {
+          if (data.participants && data.participants.includes(user.uid)) {
             routines.push({
               id: `routine-${doc.id}`,
               title: data.title,
               originalRoutineId: doc.id,
-              joinedAt: data.sharedAt,
+              joinedAt: data.updatedAt,
               isOwner: true,
             });
           }
         });
 
-      // 내가 참여한 루틴들
-      const participantQuery = query(
-        collection(db, "routines"), 
-        where("userId", "==", user.uid), 
-        where("isParticipant", "==", true)
-      );
-      const participantSnapshot = await getDocs(participantQuery);
-      
-      participantSnapshot.docs.forEach((doc) => {
-        const data = doc.data();
-        routines.push({
-          id: `routine-${data.originalRoutineId}`,
-          title: data.title,
-          originalRoutineId: data.originalRoutineId,
-          joinedAt: data.joinedAt,
-          isOwner: false, // 참여자임을 표시
+        // 다른 사람이 공유한 루틴 중 내가 참여한 것들
+        const participatedSharedQuery = query(
+          collection(db, "shared_routines"),
+          where("participants", "array-contains", user.uid) // participants 배열에 내가 포함된 것
+        );
+        const participatedSnapshot = await getDocs(participatedSharedQuery);
+
+        participatedSnapshot.docs.forEach((doc) => {
+          const data = doc.data();
+
+          // 내가 공유한 루틴이 아닌 경우만 (중복 방지)
+          if (data.sharedBy !== user.uid) {
+            routines.push({
+              id: `routine-${doc.id}`,
+              title: data.title,
+              originalRoutineId: doc.id,
+              joinedAt: data.sharedAt || data.createdAt || new Date(),
+              isOwner: false,
+            });
+          }
         });
-      });
 
-      // 중복 제거 (같은 루틴에 대해 공유자이면서 참여자인 경우)
-      const uniqueRoutines = routines.filter((routine, index, self) => 
-        index === self.findIndex(r => r.id === routine.id)
-      );
+        // 내가 참여한 루틴들
+        const participantQuery = query(collection(db, "routines"), where("userId", "==", user.uid), where("isParticipant", "==", true));
+        const participantSnapshot = await getDocs(participantQuery);
 
+        participantSnapshot.docs.forEach((doc) => {
+          const data = doc.data();
+          routines.push({
+            id: `routine-${data.originalRoutineId}`,
+            title: data.title,
+            originalRoutineId: data.originalRoutineId,
+            joinedAt: data.joinedAt,
+            isOwner: false, // 참여자임을 표시
+          });
+        });
+
+        // 중복 제거 (같은 루틴에 대해 공유자이면서 참여자인 경우)
+        const uniqueRoutines = routines.filter((routine, index, self) => index === self.findIndex((r) => r.id === routine.id));
 
         setJoinedRoutines(uniqueRoutines);
       } catch (error) {
@@ -222,11 +223,7 @@ function Chat({ user }) {
 
       const fetchJoinedRoutines = async () => {
         try {
-          const q = query(
-            collection(db, "routines"),
-            where("userId", "==", user.uid),
-            where("isParticipant", "==", true)
-          );
+          const q = query(collection(db, "routines"), where("userId", "==", user.uid), where("isParticipant", "==", true));
 
           const snapshot = await getDocs(q);
           const routines = snapshot.docs.map((doc) => {
@@ -303,21 +300,24 @@ function Chat({ user }) {
     if (message.timestamp.toDate) {
       return message.timestamp.toDate();
     }
-    if (typeof message.timestamp === 'object' && message.timestamp.seconds) {
+    if (typeof message.timestamp === "object" && message.timestamp.seconds) {
       return new Date(message.timestamp.seconds * 1000);
     }
     return new Date(0);
   };
 
-  const { oldMessages, newMessages } = messages.reduce((acc, message) => {
-    const messageDate = getMessageDate(message);
-    if (messageDate > userLoginTime) {
-      acc.newMessages.push(message)
-    } else {
-      acc.oldMessages.push(message)
-    }
-    return acc
-  }, { oldMessages: [], newMessages: [] });
+  const { oldMessages, newMessages } = messages.reduce(
+    (acc, message) => {
+      const messageDate = getMessageDate(message);
+      if (messageDate > userLoginTime) {
+        acc.newMessages.push(message);
+      } else {
+        acc.oldMessages.push(message);
+      }
+      return acc;
+    },
+    { oldMessages: [], newMessages: [] }
+  );
 
   const hasOldMessages = oldMessages.length > 0;
 
@@ -377,40 +377,37 @@ function Chat({ user }) {
       </div>
 
       {/* 사용자 정보 표시 */}
-      <div className='userinfo'>
-        <p className='nickname-section'>현재 내 닉네임 : {userName}</p>
-        <p className='login-time-info'>접속 시간 : {userLoginTime.toLocaleTimeString()}</p>
+      <div className="userinfo">
+        <p className="nickname-section">현재 내 닉네임 : {userName}</p>
+        <p className="login-time-info">접속 시간 : {userLoginTime.toLocaleTimeString()}</p>
       </div>
 
       {/* 메시지 목록 */}
       <div className="messages-container">
         {/* 이전 메세지 */}
-        {hasOldMessages && oldMessages.map(message => (
-          <div key={message.id} className={`message ${message.userId === currentUser.uid ? 'my-message' : 'other-message'}`}>
-            {message.type === 'routine_share' ? (
-              <RoutineShareMessage
-                message={message}
-                onJoinRoutine={joinRoutine}
-                currentUserId={currentUser.uid}
-              />
-            ) : message.type === 'system' ? (
-              <div className="system-message">
-                <span className="system-text">{message.text}</span>
-                <span className="message-time">{formatTimestamp(message.timestamp)}</span>
-              </div>
-            ) : (
-              <>
-                <div className="message-info">
-                  <span className="message-user">{message.user}</span>
+        {hasOldMessages &&
+          oldMessages.map((message) => (
+            <div key={message.id} className={`message ${message.userId === currentUser.uid ? "my-message" : "other-message"}`}>
+              {message.type === "routine_share" ? (
+                <RoutineShareMessage message={message} onJoinRoutine={joinRoutine} currentUserId={currentUser.uid} />
+              ) : message.type === "system" ? (
+                <div className="system-message">
+                  <span className="system-text">{message.text}</span>
                   <span className="message-time">{formatTimestamp(message.timestamp)}</span>
                 </div>
-                <div className="message-bubble">
-                  <div className="message-text">{message.text}</div>
-                </div>
-              </>
-            )}
-          </div>
-        ))}
+              ) : (
+                <>
+                  <div className="message-info">
+                    <span className="message-user">{message.user}</span>
+                    <span className="message-time">{formatTimestamp(message.timestamp)}</span>
+                  </div>
+                  <div className="message-bubble">
+                    <div className="message-text">{message.text}</div>
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
 
         {/* 구분선 */}
         <div className="message-divider">
@@ -418,15 +415,11 @@ function Chat({ user }) {
         </div>
 
         {/* 새 메세지 */}
-        {newMessages.map(message => (
-          <div key={message.id} className={`message ${message.userId === currentUser.uid ? 'my-message' : 'other-message'}`}>
-            {message.type === 'routine_share' ? (
-              <RoutineShareMessage
-                message={message}
-                onJoinRoutine={joinRoutine}
-                currentUserId={currentUser.uid}
-              />
-            ) : message.type === 'system' ? (
+        {newMessages.map((message) => (
+          <div key={message.id} className={`message ${message.userId === currentUser.uid ? "my-message" : "other-message"}`}>
+            {message.type === "routine_share" ? (
+              <RoutineShareMessage message={message} onJoinRoutine={joinRoutine} currentUserId={currentUser.uid} />
+            ) : message.type === "system" ? (
               <div className="system-message">
                 <span className="system-text">{message.text}</span>
                 <span className="message-time">{formatTimestamp(message.timestamp)}</span>
@@ -469,12 +462,9 @@ function Chat({ user }) {
       </div>
 
       {/* 루틴 공유 모달 */}
-      {showRoutineModal && <RoutineShareModal 
-      onClose={() => setShowRoutineModal(false)} 
-      user={user} 
-      userName={userName}
-      onRoutineShared={handleRoutineShared}
-      />}
+      {showRoutineModal && (
+        <RoutineShareModal onClose={() => setShowRoutineModal(false)} user={user} userName={userName} onRoutineShared={handleRoutineShared} />
+      )}
     </div>
   );
 }
