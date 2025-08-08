@@ -2,7 +2,7 @@ import { db, auth } from "../../firebase/firebase";
 import { useEffect, useState } from "react";
 import { collection, getDocs, addDoc, serverTimestamp, doc, query, where, updateDoc, onSnapshot } from "firebase/firestore";
 
-function RoutineShareModal({ onClose, currentChatRoom }) {
+function RoutineShareModal({ onClose, currentChatRoom,onRoutineShared }) {
   const [routines, setRoutines] = useState([]);
   const [loading, setLoading] = useState(true);
   const user = auth.currentUser;
@@ -13,10 +13,7 @@ function RoutineShareModal({ onClose, currentChatRoom }) {
       return;
     }
 
-    const q = query(
-      collection(db, "routines"),
-      where("userId", "==", user.uid)
-    );
+    const q = query(collection(db, "routines"), where("userId", "==", user.uid));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       try {
@@ -35,7 +32,6 @@ function RoutineShareModal({ onClose, currentChatRoom }) {
 
         setRoutines(shareableRoutines);
         setLoading(false);
-
       } catch (error) {
         console.error("루틴 조회 실패:", error);
         setLoading(false);
@@ -49,11 +45,9 @@ function RoutineShareModal({ onClose, currentChatRoom }) {
     try {
       // 이미 공유된 루틴인지 확인
       const isAlreadyShared = routine.isShared === true;
-      
+
       if (isAlreadyShared) {
-        const confirmReShare = window.confirm(
-          `"${routine.title}" 루틴은 이미 공유된 루틴입니다. 다시 공유하시겠습니까?`
-        );
+        const confirmReShare = window.confirm(`"${routine.title}" 루틴은 이미 공유된 루틴입니다. 다시 공유하시겠습니까?`);
         if (!confirmReShare) return;
       }
 
@@ -68,10 +62,17 @@ function RoutineShareModal({ onClose, currentChatRoom }) {
         isActive: true,
       });
 
+
+      await updateDoc(doc(db, "routines",routine.id),{
+        isShared:true,
+        sharedRoutineId: sharedRoutineRef.id, // 공유된 루틴과 연결
+        updatedAt: new Date()
+      })
+
       // 전체 채팅에 공유 메시지 전송
-      const shareText = isAlreadyShared ? 
-        `${user.displayName || user.email}님이 "${routine.title}" 루틴을 다시 공유했습니다.` :
-        `${user.displayName || user.email}님이 "${routine.title}" 루틴을 공유했습니다.`;
+      const shareText = isAlreadyShared
+        ? `${user.displayName || user.email}님이 "${routine.title}" 루틴을 다시 공유했습니다.`
+        : `${user.displayName || user.email}님이 "${routine.title}" 루틴을 공유했습니다.`;
 
       await addDoc(collection(db, "messages"), {
         type: "routine_share",
@@ -103,6 +104,17 @@ function RoutineShareModal({ onClose, currentChatRoom }) {
       });
 
       alert(isAlreadyShared ? "루틴이 성공적으로 재공유되었습니다!" : "루틴이 성공적으로 공유되었습니다!");
+
+      if(onRoutineShared) {
+        const routineInfo = {
+          id: chatRoomId,
+          title: routine.title,
+          originalRoutineId: sharedRoutineRef.id,
+          joinedAt: new Date(),
+          isOwner:true
+        };
+        onRoutineShared(chatRoomId, routineInfo);
+      }
       onClose();
     } catch (error) {
       console.error("루틴 공유 실패", error);
@@ -136,25 +148,25 @@ function RoutineShareModal({ onClose, currentChatRoom }) {
                     <h3 className="routine-title">
                       {routine.title || "제목 없음"}
                       {routine.isShared && (
-                        <span style={{
-                          marginLeft: '8px',
-                          fontSize: '11px',
-                          background: '#ffeaa7',
-                          color: '#2d3436',
-                          padding: '2px 6px',
-                          borderRadius: '12px'
-                        }}>
+                        <span
+                          style={{
+                            marginLeft: "8px",
+                            fontSize: "11px",
+                            background: "#ffeaa7",
+                            color: "#2d3436",
+                            padding: "2px 6px",
+                            borderRadius: "12px",
+                          }}
+                        >
                           이미 공유됨
                         </span>
                       )}
                     </h3>
                     <p className="routine-description">{routine.description || "설명 없음"}</p>
-                    <small style={{color: '#666'}}>
-                      생성일: {routine.createdAt?.toDate?.()?.toLocaleDateString() || '알 수 없음'}
-                    </small>
+                    <small style={{ color: "#666" }}>생성일: {routine.createdAt?.toDate?.()?.toLocaleDateString() || "알 수 없음"}</small>
                   </div>
                   <button onClick={() => handleShare(routine)} className="modal-button modal-button-primary share-button">
-                    {routine.isShared ? '다시 공유하기' : '공유하기'}
+                    {routine.isShared ? "다시 공유하기" : "공유하기"}
                   </button>
                 </div>
               ))}
